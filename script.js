@@ -9,23 +9,23 @@ draw.strokeStyle = "black";
 for(var i=0;i<10;i++){
     draw.beginPath();
     if(i%3){
-        draw.lineWidth = 1;
-    }else{
         draw.lineWidth = 3;
+    }else{
+        draw.lineWidth = 5;
     }
-    draw.moveTo(1+i*40,1);
-    draw.lineTo(1+i*40,361);
+    draw.moveTo(2+i*80,2);
+    draw.lineTo(2+i*80,722);
     draw.stroke();
 }
 
 for(var i=0;i<10;i++){
     draw.beginPath();
     if(i%3){
-        draw.lineWidth = 1;
-    }else{
         draw.lineWidth = 3;
+    }else{
+        draw.lineWidth = 5;
     }
-    draw.moveTo(1, 1+i*40);
-    draw.lineTo(361, 1+i*40);
+    draw.moveTo(2, 2+i*80);
+    draw.lineTo(722, 2+i*80);
     draw.stroke();
 }

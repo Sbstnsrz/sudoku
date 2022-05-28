@@ -1,3 +1,14 @@
+body{
+    margin: 0;
+}
+div{
+    text-align: center;
+}
+canvas{
+    margin: 10px;
+    width: 90%;
+}
+
 .copyright{
     font-family: 'Monaco';
     text-decoration: none;
