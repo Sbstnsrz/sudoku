@@ -1,0 +1,15 @@
+.copyright{
+    font-family: 'Monaco';
+    text-decoration: none;
+    display: inline-block;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    color: grey;
+    font-size: 10px;
+
+}
+.copyright:hover{
+    font-weight: bold;
+    color: black;
+}
