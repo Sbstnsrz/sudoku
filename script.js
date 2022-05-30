@@ -48,15 +48,18 @@ do{
 function numbersGenerator(){
     
     var matrix = [];
+    j=0;
+    triesCounter=0;
 
-    for(var j=0; j<9; j++){
+    while(j<9){
         var randomLine = [];
         var numbersLine = [];
 
         for(var num=1; num<10; num++){ numbersLine.push(num);}
+
         while(numbersLine.length){
            
-            if(j>0){
+            if(j){
                 var noList = [];
                 for(var i=0; i<numbersLine.length; i++){
                     noList.push(numbersLine[i]);
@@ -68,14 +71,33 @@ function numbersGenerator(){
                         noList.splice(noList.indexOf(matrix[col][row]), 1);
                     }
                 }
-                console.log(noList);
+
+                var jBlockRef = Math.floor(j/3)*3;
+                var iBlockRef = Math.floor(randomLine.length/3)*3;
+
+                for(var col=0; (jBlockRef+col)<j; col++){  
+                    for(var row=0; (iBlockRef+row)<(iBlockRef+3); row++){
+                        if((iBlockRef+row)==randomLine.length && (jBlockRef+col)==j){
+                            break;
+                        }else if(noList.includes(matrix[jBlockRef+col][iBlockRef+row])){
+                            noList.splice(noList.indexOf(matrix[jBlockRef+col][iBlockRef+row]), 1);
+                        }
+                    }
+                    
+                }
 
                 var randomPic=0;
                 if(noList.length>0){
                     randomPic = Math.floor(Math.random()*noList.length);
                 }
+                if(!noList.length){
+                    console.log("Line redo");
+                    break;
+                }
                 randomLine.push(noList[randomPic]);
                 numbersLine.splice(numbersLine.indexOf(noList[randomPic]), 1);
+
+
             }else{
                 var randomPic = Math.floor(Math.random()*numbersLine.length);
                 randomLine.push(numbersLine[randomPic]);
@@ -83,8 +105,22 @@ function numbersGenerator(){
             }
 
         }
-        matrix.push(randomLine);
-        
+
+        if(randomLine.length==9){
+            console.log(randomLine);
+            matrix.push(randomLine);
+            triesCounter=0;
+            j++;
+        }else{
+            triesCounter++;
+        }
+
+        if(triesCounter>9){
+            matrix.pop();
+            console.log("Previous line deleted");
+            triesCounter=0;
+            j--;
+        }
     }
 
     return matrix;
