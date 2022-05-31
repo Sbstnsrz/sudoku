@@ -5,7 +5,7 @@ function doBoardBackground(){
     draw.fillStyle = "WhiteSmoke";
     draw.fillRect(0,0,490,490);
     //Grey backgrounds:
-    draw.fillStyle = "LightGrey";
+    draw.fillStyle = "Gainsboro";
     draw.fillRect(  2,  2,162,162);
     draw.fillRect(  2,326,162,162);
     draw.fillRect(166,166,162,162);
@@ -106,7 +106,6 @@ function numbersGenerator(){
         }
         //If line complete, push to matrix. If not, try again:
         if(randomLine.length==9){
-            console.log(randomLine);
             matrix.push(randomLine);
             triesCounter=0;
             j++;
@@ -130,7 +129,9 @@ function boardFill(matrix){
     draw.font = "3em Arial";
     for (var y = 0; y < 9; y++){
         for(var x = 0; x < 9; x++){
-            draw.fillText(matrix[y][x], 54*x + 15, 54*y + 47);
+            if(matrix[y][x]){
+                draw.fillText(matrix[y][x], 54*x + 15, 54*y + 47);
+            }
         }
     }
 }
@@ -141,7 +142,7 @@ function selectionCross(x,y){
 
     if(y>484){return false;}
 
-    draw.globalAlpha = 0.3;
+    draw.globalAlpha = 0.2;
     draw.fillStyle = "SkyBlue";
     draw.fillRect(initX+3, 3, 54, 484);
     draw.fillRect(3, initY+3, 484, 54);
@@ -150,21 +151,58 @@ function selectionCross(x,y){
 }
 
 (()=>{
-    var matrix = numbersGenerator();
+    var solution = numbersGenerator();
+    var game = gameGenerator(solution);
+    /*
+    for(var j=0;j<9;j++){
+        for(var i=0;i<9;i++){
+            if(Math.round(Math.random())){
+                game[j][i] = solution[j][i];
+            }
+        }
+    }
+    */
+    console.log(game);
+    console.log(doMatrix());
+
 
     doBoardBackground();
     doLines();
-    boardFill(matrix);
-
-    console.log(matrix);
+    boardFill(game);
 
     scr.addEventListener("click", function(e) {
         
         console.log(e.offsetX,e.pageX, e.offsetY, e.pageY);
         doBoardBackground();
         doLines();
-        boardFill(matrix);
+        boardFill(game);
         selectionCross(e.offsetX, e.offsetY);
     });
 })();
+
+function doMatrix(){
+    var matrix=[];
+    for(var j=0;j<9;j++){
+        var temp = [];
+        for(var i=0;i<9;i++){
+            temp.push(0);
+        }
+        matrix.push(temp);
+    }
+    return matrix;
+}
+
+function gameGenerator(puzzle){
+    var count = 17;
+    var random = doMatrix();
+    while(count){
+        var j = Math.floor(Math.random()*9);
+        var i = Math.floor(Math.random()*9);
+        if(puzzle[j][i]!=random[j][i]){
+            random[j][i]=puzzle[j][i];
+            count--;
+        }    
+    }
+    return random;
+}
 
