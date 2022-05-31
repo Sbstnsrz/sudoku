@@ -1,70 +1,76 @@
 var scr = document.getElementById("draw");
 var draw = scr.getContext("2d");
-var xUnit = scr.width/100;
-var y = scr.height;
 
-draw.fillStyle = "WhiteSmoke";
-draw.fillRect(0,0,100*xUnit,100*xUnit);
-
-draw.lineCap = "round";
-draw.strokeStyle = "black";
-
-
-//Grey backgrounds:
-draw.fillStyle = "LightGrey";
-draw.fillRect(           xUnit,            xUnit, 98/3*xUnit, 98/3*xUnit);
-draw.fillRect(           xUnit, (1+98/3*2)*xUnit, 98/3*xUnit, 98/3*xUnit);
-draw.fillRect(  (1+98/3)*xUnit,   (1+98/3)*xUnit, 98/3*xUnit, 98/3*xUnit);
-draw.fillRect((1+98/3*2)*xUnit,            xUnit, 98/3*xUnit, 98/3*xUnit);
-draw.fillRect((1+98/3*2)*xUnit, (1+98/3*2)*xUnit, 98/3*xUnit, 98/3*xUnit);
-
+function doBoardBackground(){
+    draw.fillStyle = "WhiteSmoke";
+    draw.fillRect(0,0,490,490);
+    //Grey backgrounds:
+    draw.fillStyle = "LightGrey";
+    draw.fillRect(  2,  2,162,162);
+    draw.fillRect(  2,326,162,162);
+    draw.fillRect(166,166,162,162);
+    draw.fillRect(326,  2,162,162);
+    draw.fillRect(326,326,162,162);
+}
 //draw gameboard lines:
-var start = true;
-do{
-    for(var i=0;i<10;i++){
-        draw.beginPath();
-        if(i%3){
-            draw.globalAlpha = 0.5;
-            draw.lineWidth = 0.5*xUnit;
-        }else{
-            draw.globalAlpha = 1.0;
-            draw.lineWidth = 1.25*xUnit;
-        }
+function doLines(){
+    var start = true;
 
-        var lineIndex = (1 + i*(98/9))*xUnit;
-        if(start){
-            draw.moveTo(lineIndex,    xUnit);
-            draw.lineTo(lineIndex, 99*xUnit);
-        }else{
-            draw.moveTo(   xUnit, lineIndex);
-            draw.lineTo(99*xUnit, lineIndex);
-        }
-        draw.stroke();
-    }
-    start = !start;
-}while(!start);
+    draw.lineCap = "round";
+    draw.strokeStyle = "black";
 
+    do{
+        for(var i=0;i<10;i++){
+            draw.beginPath();
+            if(i%3){
+                draw.globalAlpha = 0.5;
+                draw.lineWidth = 3;
+            }else{
+                draw.globalAlpha = 1.0;
+                draw.lineWidth = 5;
+            }
+
+            var lineIndex = (2 + i*54);
+            if(start){
+                draw.moveTo(lineIndex,  2);
+                draw.lineTo(lineIndex,486);
+            }else{
+                draw.moveTo(  2, lineIndex);
+                draw.lineTo(486, lineIndex);
+            }
+            draw.stroke();
+        }
+        start = !start;
+    }while(!start);
+}
 
 function numbersGenerator(){
     
     var matrix = [];
-    j=0;
-    triesCounter=0;
-
+    var j=0;
+    var triesCounter=0;
+    //Column loop:
     while(j<9){
         var randomLine = [];
         var numbersLine = [];
-
-        for(var num=1; num<10; num++){ numbersLine.push(num);}
-
+        //Completes numbersLine whit 1 to 9:
+        for(var num=1; num<10; num++){
+            numbersLine.push(num);
+        }
+        //Line loop:
         while(numbersLine.length){
-           
+            //Exception for the first line:
             if(j){
                 var noList = [];
+                var randomPic=0;
+                var jBlockRef = Math.floor(j/3)*3;
+                var iBlockRef = Math.floor(randomLine.length/3)*3;
+
+                //copies numbersLine to noList:
                 for(var i=0; i<numbersLine.length; i++){
                     noList.push(numbersLine[i]);
                 }
-
+                //Find in top items, if a number of noList is finded, splices it:
                 for(var col=0; col<j; col++){
                     var row = randomLine.length;
                     if(noList.includes(matrix[col][row])){
@@ -72,9 +78,7 @@ function numbersGenerator(){
                     }
                 }
 
-                var jBlockRef = Math.floor(j/3)*3;
-                var iBlockRef = Math.floor(randomLine.length/3)*3;
-
+                //Find numbers in  block section, if found, splice it from noList:
                 for(var col=0; (jBlockRef+col)<j; col++){  
                     for(var row=0; (iBlockRef+row)<(iBlockRef+3); row++){
                         if((iBlockRef+row)==randomLine.length && (jBlockRef+col)==j){
@@ -82,22 +86,17 @@ function numbersGenerator(){
                         }else if(noList.includes(matrix[jBlockRef+col][iBlockRef+row])){
                             noList.splice(noList.indexOf(matrix[jBlockRef+col][iBlockRef+row]), 1);
                         }
-                    }
-                    
+                    }  
                 }
-
-                var randomPic=0;
-                if(noList.length>0){
-                    randomPic = Math.floor(Math.random()*noList.length);
-                }
+                //noList without items means no valid option avail. Interrupt and redo line.
                 if(!noList.length){
-                    console.log("Line redo");
                     break;
                 }
+                //All good, pass picked item from numbersLine to randomLine:
+                randomPic = Math.floor(Math.random()*noList.length);
                 randomLine.push(noList[randomPic]);
                 numbersLine.splice(numbersLine.indexOf(noList[randomPic]), 1);
-
-
+            //First line exception. No verifications needed:
             }else{
                 var randomPic = Math.floor(Math.random()*numbersLine.length);
                 randomLine.push(numbersLine[randomPic]);
@@ -105,7 +104,7 @@ function numbersGenerator(){
             }
 
         }
-
+        //If line complete, push to matrix. If not, try again:
         if(randomLine.length==9){
             console.log(randomLine);
             matrix.push(randomLine);
@@ -114,10 +113,9 @@ function numbersGenerator(){
         }else{
             triesCounter++;
         }
-
+        //If tries more than 9, delete previous line in matrix and continue:
         if(triesCounter>9){
             matrix.pop();
-            console.log("Previous line deleted");
             triesCounter=0;
             j--;
         }
@@ -125,16 +123,48 @@ function numbersGenerator(){
 
     return matrix;
 }
-( ()=>{
-    var matrix = numbersGenerator();
+
+function boardFill(matrix){
     draw.fillStyle = "black";
-    draw.lineWidth = 0.5*xUnit;
-    draw.font = "4em Arial";
+    draw.lineWidth = 2;
+    draw.font = "3em Arial";
     for (var y = 0; y < 9; y++){
         for(var x = 0; x < 9; x++){
-            draw.fillText(matrix[y][x], (4.5 + x*(98/9))*xUnit, ((98/9)*(y+1)-1)*xUnit);
+            draw.fillText(matrix[y][x], 54*x + 15, 54*y + 47);
         }
     }
+}
+
+function selectionCross(x,y){
+    initX = x - x%54;
+    initY = y - y%54;
+
+    if(y>484){return false;}
+
+    draw.globalAlpha = 0.3;
+    draw.fillStyle = "SkyBlue";
+    draw.fillRect(initX+3, 3, 54, 484);
+    draw.fillRect(3, initY+3, 484, 54);
+    draw.globalAlpha = 1.0;
+
+}
+
+(()=>{
+    var matrix = numbersGenerator();
+
+    doBoardBackground();
+    doLines();
+    boardFill(matrix);
+
     console.log(matrix);
+
+    scr.addEventListener("click", function(e) {
+        
+        console.log(e.offsetX,e.pageX, e.offsetY, e.pageY);
+        doBoardBackground();
+        doLines();
+        boardFill(matrix);
+        selectionCross(e.offsetX, e.offsetY);
+    });
 })();
 
