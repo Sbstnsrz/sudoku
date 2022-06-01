@@ -49,6 +49,7 @@ function buttons(){
 
     draw.fillStyle = "WhiteSmoke";
     draw.fillRect(2, 540, 486 ,54);
+    draw.fillRect(2, 648, 486 ,54);
     draw.fillStyle = "black";
 
     for(var num=1; num<10; num++){
@@ -78,6 +79,21 @@ function buttons(){
             draw.fillText(numbersLine[x], 54*x + 15, 54*10 + 47);
         }
     }
+    draw.font = "2em Arial";
+    draw.fillText("   Nuevo      Errores?       Pista", 15, 54*12 + 37);
+    draw.lineWidth = 5;
+    draw.beginPath();
+    draw.moveTo(  2,648);
+    draw.lineTo(486,648);
+    draw.lineTo(486,702);
+    draw.lineTo(  2,702);
+    draw.lineTo(  2,648);
+    draw.moveTo(164,648);
+    draw.lineTo(164,702);
+    draw.moveTo(326,648);
+    draw.lineTo(326,702);
+    draw.stroke();
+    
 }
 
 function numbersGenerator(){
@@ -177,9 +193,9 @@ function clickSelection(prev, x,y){
 
     var loc = [initX, initY];
 
-    if((initY==9) || (prev[0]==loc[0] && prev[1]==loc[1])){
+    if(initY==9 || (prev[0]==loc[0] && prev[1]==loc[1]) || initY==11){
         return [];
-    }else if(initY==10){
+    }else if(initY==10 || initY==12){
         return loc;
     }else{
         console.log("Cross");
@@ -198,8 +214,8 @@ function drawCross(loc){
 
 (()=>{
     var solution = numbersGenerator();
-    var game = gameGenerator(solution);
     var answer = doMatrix();
+    var game = doMatrix();
     
     var selection = [];
 
@@ -210,7 +226,7 @@ function drawCross(loc){
         boardReload(game, answer);
 
         var tempSel = clickSelection(selection, e.offsetX, e.offsetY);
-        if(tempSel[1] == 10){
+        if(tempSel[1] == 10 && selection.length>1){
             if(game[selection[1]][selection[0]] == 0){
                 if(answer[selection[1]][selection[0]] == tempSel[0]+1){
                     answer[selection[1]][selection[0]] = 0;
@@ -218,20 +234,44 @@ function drawCross(loc){
                     answer[selection[1]][selection[0]] = tempSel[0]+1;
                 }
                 boardReload(game, answer);
-                console.log(answer);
             }
         }
+        if(tempSel[1] == 12){
+            if(tempSel[0]<3){
+                console.log("New");
+                solution = numbersGenerator();
+                game = doMatrix();
+                answer = doMatrix();
+                gameGenerator(solution, game, 35);
+                boardReload(game, answer);
+            }else if(tempSel[0]<6){
+                console.log("Missed");
+                var temp = doMatrix();
+                for(var j=0; j<9; j++){
+                    for(var i=0; i<9; i++){
+                        if(solution[j][i]!=answer[j][i] && answer[j][i]!=0){
+                            temp[j][i]=answer[j][i];
+                        }
+                    }
+                }
+                draw.fillStyle = "red";
+                boardFill(temp);
+            }else{
+                console.log("Clue");
+                gameGenerator(solution, game, 1);
+                boardFill(game);
+            }
+        }         
+            
 
         selection=tempSel;
-
-        console.log(selection);
     });
 })();
 
 function boardReload(game, answer){
     doBoardBackground();
     doLines();
-    draw.fillStyle = "blue";
+    draw.fillStyle = "DarkBlue";
     boardFill(answer);
     draw.fillStyle = "black";
     boardFill(game);
@@ -250,21 +290,14 @@ function doMatrix(){
     return matrix;
 }
 
-function gameGenerator(puzzle){
-    var count = 30;
-    var random = doMatrix();
+function gameGenerator(puzzle, answer, count){
     while(count){
         var j = Math.floor(Math.random()*9);
         var i = Math.floor(Math.random()*9);
-        if(puzzle[j][i]!=random[j][i]){
-            random[j][i]=puzzle[j][i];
+        if(puzzle[j][i]!=answer[j][i] && answer[j][i]==0){
+            answer[j][i]=puzzle[j][i];
             count--;
         }    
     }
-    return random;
-}
-
-function setNumber(select, x, y){
-    
 }
 
